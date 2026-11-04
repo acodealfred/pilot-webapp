@@ -1,0 +1,54 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Install backend dependencies
+        run: pip install -r backend/requirements-dev.txt
+
+      - name: Lint
+        run: ruff check backend tests
+
+      - name: Build front end
+        working-directory: frontend
+        run: |
+          npm install
+          npm run build
+
+      - name: Unit and BDD tests
+        run: pytest -v
+
+      - name: Install browser
+        run: playwright install --with-deps chromium
+
+      - name: Start app
+        run: |
+          uvicorn app.main:app --app-dir backend --port 8000 &
+          for i in $(seq 1 30); do
+            curl -sf http://localhost:8000/api/health && exit 0
+            sleep 1
+          done
+          echo "App did not start" && exit 1
+
+      - name: End-to-end tests
+        run: pytest -v -m e2e --base-url http://localhost:8000

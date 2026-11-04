@@ -1,0 +1,9 @@
+line-length = 120
+target-version = "py313"
+
+[lint]
+select = ["E", "F", "I", "B"]
+
+[lint.isort]
+known-first-party = ["app"]
+known-third-party = ["fastapi", "pytest_bdd", "playwright"]
