@@ -37,6 +37,7 @@ pytest -m e2e --base-url http://localhost:8000
 - Never push to `main`, never merge, never force-push.
 - Never edit a `.feature` file to make a test pass. If the story is wrong, stop and say so in the PR.
 - Give every UI element a test uses a `data-testid`.
+- Browser test files end in `_ui.py` (for example `tests/e2e/test_pil_1_about_page_ui.py`), so they never share a name with the story's BDD test.
 - Add a dependency only when the story needs it, and say why in `spec.md`.
 - No secrets, tokens or real personal data in code, tests or fixtures.
 - Keep the change to what the story asks for.
