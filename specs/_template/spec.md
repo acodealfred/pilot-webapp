@@ -24,4 +24,4 @@ What the user can do after this change, in two or three sentences. Copy nothing 
 
 | Scenario (from the `.feature` file) | Test |
 | --- | --- |
-| <scenario name> | `tests/bdd/test_<key>_<slug>.py` or `tests/e2e/test_<key>_<slug>.py` |
+| <scenario name> | `tests/bdd/test_<key>_<slug>.py` or `tests/e2e/test_<key>_<slug>_ui.py` |
