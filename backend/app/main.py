@@ -11,6 +11,8 @@ from fastapi.staticfiles import StaticFiles
 
 FRONTEND_DIST = Path(__file__).resolve().parents[2] / "frontend" / "dist"
 
+APP_VERSION = "0.1.0"
+
 app = FastAPI(title="Spear818 Pilot Web App")
 
 
@@ -18,6 +20,12 @@ app = FastAPI(title="Spear818 Pilot Web App")
 def health() -> dict[str, str]:
     """Liveness check used by CI, Docker and the home page."""
     return {"status": "ok"}
+
+
+@app.get("/api/version")
+def version() -> dict[str, str]:
+    """Report the app version shown on the About page."""
+    return {"version": APP_VERSION}
 
 
 if FRONTEND_DIST.exists():
