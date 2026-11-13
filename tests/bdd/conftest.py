@@ -26,3 +26,8 @@ def response_status(context, code):
 @then(parsers.parse('the response field "{field}" is "{value}"'))
 def response_field(context, field, value):
     assert str(context["response"].json()[field]) == value
+
+
+@then("the response is an empty list")
+def response_empty_list(context):
+    assert context["response"].json() == []

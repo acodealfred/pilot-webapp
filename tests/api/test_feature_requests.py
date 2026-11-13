@@ -38,3 +38,33 @@ def test_blank_title_rejected(client, title):
 def test_unknown_category_rejected(client):
     r = client.post("/api/feature-requests", json={"title": "x", "category": "Security"})
     assert r.status_code == 422
+
+
+def _add(client, title, description=""):
+    client.post(
+        "/api/feature-requests",
+        json={"title": title, "description": description, "category": "UI"},
+    )
+
+
+def _titles(client, q):
+    return [i["title"] for i in client.get("/api/feature-requests", params={"q": q}).json()]
+
+
+def test_search_matches_title_ignoring_case_and_keeps_order(client):
+    for title in ("Dark mode", "Faster search", "DARK theme"):
+        _add(client, title)
+    assert _titles(client, "dark") == ["DARK theme", "Dark mode"]
+    assert _titles(client, "  ARK M ") == ["Dark mode"]
+    assert _titles(client, "zzz") == []
+
+
+def test_blank_search_returns_everything(client):
+    _add(client, "A")
+    assert _titles(client, "") == ["A"]
+    assert _titles(client, "   ") == ["A"]
+
+
+def test_search_ignores_description(client):
+    _add(client, "A", "dark")
+    assert _titles(client, "dark") == []

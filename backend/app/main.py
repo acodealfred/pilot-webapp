@@ -56,9 +56,10 @@ def create_feature_request(body: FeatureRequestIn) -> dict[str, str]:
 
 
 @app.get("/api/feature-requests")
-def list_feature_requests() -> list[dict[str, str]]:
-    """List feature requests, newest first."""
-    return list(reversed(feature_requests))
+def list_feature_requests(q: str = "") -> list[dict[str, str]]:
+    """List feature requests, newest first. `q` keeps titles containing the text."""
+    needle = q.strip().lower()
+    return [i for i in reversed(feature_requests) if needle in i["title"].lower()]
 
 
 if FRONTEND_DIST.exists():

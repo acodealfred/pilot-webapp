@@ -65,17 +65,27 @@ async function renderFeatureRequests(root: HTMLElement): Promise<void> {
       <p data-testid="request-error" role="alert" hidden></p>
       <button type="submit" data-testid="request-submit">Submit</button>
     </form>
+    <p><label>Search <input type="search" data-testid="request-search" name="search" /></label></p>
+    <p data-testid="request-empty" hidden>No requests found</p>
     <ul data-testid="request-list"></ul>
   `;
   const form = root.querySelector<HTMLFormElement>("#request-form")!;
   const error = root.querySelector<HTMLElement>('[data-testid="request-error"]')!;
   const list = root.querySelector<HTMLElement>('[data-testid="request-list"]')!;
 
+  const search = root.querySelector<HTMLInputElement>('[data-testid="request-search"]')!;
+  const empty = root.querySelector<HTMLElement>('[data-testid="request-empty"]')!;
+  let latest = 0;
+
   async function refresh(): Promise<void> {
+    const ticket = ++latest;
+    const q = search.value.trim();
     try {
-      const response = await fetch("/api/feature-requests");
+      const response = await fetch(`/api/feature-requests?q=${encodeURIComponent(q)}`);
       if (!response.ok) return;
       const items = (await response.json()) as FeatureRequest[];
+      if (ticket !== latest) return;
+      empty.hidden = !(q && items.length === 0);
       list.innerHTML = items
         .map((i) => {
           const description = i.description ? `<br>${escapeHtml(i.description)}` : "";
@@ -86,6 +96,8 @@ async function renderFeatureRequests(root: HTMLElement): Promise<void> {
       // keep the current list
     }
   }
+
+  search.addEventListener("input", () => void refresh());
 
   form.addEventListener("submit", async (event) => {
     event.preventDefault();
